@@ -1,0 +1,6 @@
+# Ignore virtual environments
+venv/
+env/
+__env__/
+.venv/
+.env/
