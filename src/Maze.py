@@ -40,3 +40,18 @@ def load_maze(filename):
     with open(filename, 'r') as f:
         data = json.load(f)
         return data["maze"]
+
+def main():
+    # Note: 0 = path, 1 = wall
+    # maze = [
+    #     [0, 0, 1, 1, 1, 1, 1, 0, 0],
+    #     [1, 0, 0, 1, 1, 1, 1, 0, 0],
+    #     [1, 1, 0, 0, 1, 1, 1, 0, 0],
+    #     [1, 1, 1, 0, 0, 0, 0, 0, 0]
+    # ]
+    maze = load_maze("config.json")
+    maze1 = Maze(maze)
+    maze1.print_adjacency_list()
+
+if __name__ == '__main__':
+    main()
