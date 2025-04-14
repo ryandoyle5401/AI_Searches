@@ -1,18 +1,17 @@
 import matplotlib.pyplot as plt
-from matplotlib import colormaps
+import random
 
-def display_maze(maze, color):
+def display_maze(maze):
+    color = select_display_color()
     plt.imshow(maze, cmap=color)
-    #plt.matshow(maze, cmap='viridis')
     plt.axis('off')  # Turn off the axis
     plt.show()
 
-# Example maze
-maze = [
-    [0, 0, 1, 1, 1, 1, 1, 0, 0],
-    [1, 0, 0, 1, 1, 1, 1, 0, 0],
-    [1, 1, 0, 0, 1, 1, 1, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0, 0, 0]
-]
-
-display_maze(maze, 'cool_r')
+def select_display_color():
+    color_maps = [
+        "spring", "cividis", "plasma", "RdGy",
+        "Wistia", "brg", "bwr", "flag", "gnuplot",
+        "nipy_spectral", "tab20b", "RdGy_r", "cool_r"
+    ]
+    choice = random.randrange(0,13)  # Select a random value from 0 to 12
+    return color_maps[choice]  # Returns a randomly selected color map for the display
