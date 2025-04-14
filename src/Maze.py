@@ -1,7 +1,13 @@
+import json
+
 class Maze:
     def __init__(self, grid):
-        self.grid = grid
-        self.adj_list = self.build_adjacency_list()
+        """
+            Note: this is the structure of the adjacency list:
+            ((row, col), edge_weight)
+        """
+        self.grid = grid  # Grid is the 2D array representing the maze
+        self.adj_list = self.build_adjacency_list()  # Converts 2D array to adjacency list
 
     def get_neighbors(self, row, col):
         # Different directions to move to in the maze
@@ -16,6 +22,9 @@ class Maze:
         return neighbors
 
     def build_adjacency_list(self):
+        """
+            Iterates through the 2D array and converts it to an adjacency list.
+        """
         adj_list = {}
         for r in range(len(self.grid)):
             for c in range(len(self.grid[0])):
@@ -23,26 +32,11 @@ class Maze:
                     adj_list[(r,c)] = self.get_neighbors(r,c)
         return adj_list
 
-    # I'm still working on this
-    def print_stuff(self):
-        for r in self.grid:
-            print(r)
-
     def print_adjacency_list(self):
         for node, neighbors in self.adj_list.items():
             print(f"{node}: {neighbors}")
 
-def main():
-    # Note: 0 = path, 1 = wall
-    maze = [
-        [0, 0, 1, 1, 1, 1, 1, 0, 0],
-        [1, 0, 0, 1, 1, 1, 1, 0, 0],
-        [1, 1, 0, 0, 1, 1, 1, 0, 0],
-        [1, 1, 1, 0, 0, 0, 0, 0, 0]
-    ]
-    maze1 = Maze(maze)
-    #maze1.print_stuff()
-    maze1.print_adjacency_list()
-
-if __name__ == '__main__':
-    main()
+def load_maze(filename):
+    with open(filename, 'r') as f:
+        data = json.load(f)
+        return data["maze"]
