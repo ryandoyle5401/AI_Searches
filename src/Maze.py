@@ -1,4 +1,5 @@
 import json
+from DisplayMaze import display_maze
 
 class Maze:
     def __init__(self, grid):
@@ -50,6 +51,7 @@ def main():
     #     [1, 1, 1, 0, 0, 0, 0, 0, 0]
     # ]
     maze = load_maze("config.json")
+    display_maze(maze)
     maze1 = Maze(maze)
     maze1.print_adjacency_list()
 
