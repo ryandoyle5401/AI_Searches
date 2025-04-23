@@ -1,12 +1,16 @@
+import json
 import time
 
+from src.DisplayMaze import display_maze
+
+
 class Maze:
-    def __init__(self, grid):
+    def __init__(self):
         """
         Constructs a maze as a 2D array and as an adjacency list.
         2D array is used to visualize the maze, adjacency list is used to perform graph search operations over the maze.
         """
-        self.grid = grid  # Stores 2D array
+        self.grid = load_maze("config.json")  # Stores 2D array
         self.adj_list = self.build_adjacency_list()  # Creates and stores adjacency list of 2D array
 
     def get_neighbors(self, row, col):
@@ -47,16 +51,14 @@ class Maze:
             print(f"{node}: {neighbors}")  # Prints the node and all its neighbors
 
 
+def load_maze(filename):
+    with open(filename, 'r') as f:
+        data = json.load(f)
+        return data["maze"]
 
 def main():
-    # Note: 0 = path, 1 = wall
-    maze = [
-        [0, 0, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 1, 1, 1, 1, 1],
-        [0, 0, 1, 0, 1, 1, 1, 1, 1],
-        [1, 1, 1, 0, 0, 0, 0, 0, 0]
-    ]
-    maze1 = Maze(maze)
+    maze1 = Maze()
+    display_maze(maze1.grid)
     graph = maze1.adj_list  # Adjacency list of given 2D array
     start_node = (0,0)  # Top-left corner of maze
     end_node = (3,8)  # Bottom-right corner of maze
