@@ -1,4 +1,5 @@
 import time
+import heapq
 
 class Maze:
     def __init__(self, grid):
@@ -63,31 +64,36 @@ def main():
 
     # Run a loop so the user can choose which search algorithms to use
     while True:
-        print("Welcome to Maze Solver! Enter the value associated with the search algorithm to perform that search on the maze. Enter -1 to exit: ")
+        print("\nWelcome to Maze Solver! Choose an algorithm (-1 to exit):")
         print("1. Breadth-first Search")
         print("2. Depth-first Search")
         print("3. Uniform-cost Search")
         print("4. A* Search")
-        user_input = input("Enter your value: ")
-        if int(user_input) == 1:
-            # Start timer
-            start = time.time()
-            run_bfs(start_node, end_node, graph)
-            # Stop timer
-            stop = time.time()
-            # Calculate elapsed time
-            elapsed = calculate_elapsed_time(start, stop)
-            print(f"Solved maze in {elapsed} time!")
-        elif int(user_input) == 2:
-            # Start timer
-            start = time.time()
-            run_dfs(start_node, end_node, graph)
-            # Stop timer
-            stop = time.time()
-            elapsed = calculate_elapsed_time(start, stop)
-            print(f"Solved maze in {elapsed} time!")
-        elif int(user_input) == -1:
+        try:
+            user_input = int(input("Enter your choice: "))
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+            continue
+
+        if user_input == -1:
+            # Exit condition
+            print("Exiting Maze Solver.")
             break
+
+        elif user_input in [1, 2, 3, 4]:
+            start_time = time.time()
+            if user_input == 1:
+                run_bfs(start_node, end_node, graph)
+            elif user_input == 2:
+                run_dfs(start_node, end_node, graph)
+            elif user_input == 3:
+                run_UCS(start_node, end_node, graph)
+            elif user_input == 4:
+                run_A_star(start_node, end_node, graph)
+            end_time = time.time()
+            print(f"Solved maze in {calculate_elapsed_time(start_time, end_time)} seconds!")
+        else:
+            print("Invalid choice. Try again.")
 
 
 def run_bfs(start, end, graph):
@@ -158,17 +164,93 @@ def run_dfs(start, end, graph):
         visited.add(current)  # Add current node to visited set
     print("Nodes Expanded:", nodes_expanded)
 
-# Note: placeholder code in this function
-def run_UCS():
-    print("running BFS")
-    for i in range(300000):
-        pass
+# Uniform-Cost Search (UCS)
+def run_UCS(start, end, graph):
+    """
+    Implements Uniform-cost Search to find the shortest path from start to end.
 
-# Note: placeholder code in this function
-def run_A_star():
-    print("running BFS")
-    for i in range(400000):
-        pass
+    Args:
+        start: starting node (tuple)
+        end: destination node (tuple)
+        graph: adjacency list representing the maze
+
+    UCS expands the node with the lowest path cost at each step.
+    """
+    frontier = [(0, start)]  # Priority queue with (cost, node)
+    came_from = {start: None}  # Tracks the path
+    cost_so_far = {start: 0}  # Stores cost to reach each node
+    nodes_expanded = 0
+
+    while frontier:
+        current_cost, current = heapq.heappop(frontier)  # Get node with lowest cost
+        nodes_expanded += 1
+
+        if current == end:
+            path = reconstruct_path(came_from, start, end)
+            print("Solution path", path)
+            break
+
+        for neighbor, weight in graph[current]:
+            new_cost = current_cost + weight  # Calculate cost to neighbor
+            # If it's a new node or cheaper path found, update records
+            if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
+                cost_so_far[neighbor] = new_cost
+                heapq.heappush(frontier, (new_cost, neighbor))  # Add neighbor to frontier
+                came_from[neighbor] = current  # Track path
+
+    print("Nodes Expanded:", nodes_expanded)
+
+def heuristic(a, b):
+    """Manhattan distance heuristic"""
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+
+# A* Search
+def run_A_star(start, end, graph):
+    """
+    Implements A* Search algorithm using Manhattan distance as heuristic.
+
+    Args:
+        start: starting node (tuple)
+        end: destination node (tuple)
+        graph: adjacency list representing the maze
+
+    A* = UCS + heuristic to prioritize promising paths.
+    """
+    # Priority queue holds (f_score, cost_so_far, node)
+    frontier = [(heuristic(start, end), 0, start)]
+    came_from = {start: None}
+    cost_so_far = {start: 0}
+    nodes_expanded = 0
+
+    while frontier:
+        _, current_cost, current = heapq.heappop(frontier)  # Node with lowest f_score
+        nodes_expanded += 1
+
+        if current == end:
+            path = reconstruct_path(came_from, start, end)
+            print("Solution path", path)
+            break
+
+        for neighbor, weight in graph[current]:
+            new_cost = current_cost + weight
+            # Update path if neighbor is unvisited or a better path is found
+            if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
+                cost_so_far[neighbor] = new_cost
+                priority = new_cost + heuristic(neighbor, end)  # f = g + h
+                heapq.heappush(frontier, (priority, new_cost, neighbor))
+                came_from[neighbor] = current
+
+    print("Nodes Expanded:", nodes_expanded)
+
+def reconstruct_path(came_from, start, end):
+    node = end
+    path = [end]
+    while node != start:
+        node = came_from[node]
+        path.append(node)
+    path.reverse()
+    return path
 
 def calculate_elapsed_time(start, stop):
     return stop - start
