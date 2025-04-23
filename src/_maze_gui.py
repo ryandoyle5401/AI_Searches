@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import PhotoImage, Label, Toplevel
 from Main import Maze, run_bfs, run_dfs, run_ucs, run_a_star, calculate_elapsed_time
@@ -42,7 +41,7 @@ class MazeApp:
         self.status_label = Label(self.root, text="", font=("Helvetica", 12), bg="#f0f0f0", pady=5)
         self.status_label.pack()
 
-        self.robot_icon = PhotoImage(file="icons/start_heart.png").subsample(2, 2)  # placeholder for robot
+        self.robot_icon = PhotoImage(file="../icons/start_heart.png").subsample(2, 2)  # placeholder for robot
         self.generate_default_maze()
 
     def generate_default_maze(self):
@@ -90,7 +89,7 @@ class MazeApp:
         start = time.time()
         came_from, path, visited = search_function(self.start_node, self.end_node, self.graph)
         end = time.time()
-        elapsed = calculate_elapsed_time(start, end)
+        elapsed = calculate_elapsed_time(start, end) * 1000
         visited_count = len(set(visited))
         self.status_label.config(text=f"{name} completed in {elapsed:.4f} seconds. Path length: {len(path)} | Visited: {visited_count}")
         self.root.after(500, lambda: self.animate_path(path))
