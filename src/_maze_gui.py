@@ -2,12 +2,11 @@ import tkinter as tk
 from tkinter import PhotoImage, Label, Toplevel
 from Main import Maze, run_bfs, run_dfs, run_ucs, run_a_star, calculate_elapsed_time
 import time
-import random
 
 class MazeApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("✨ Maze Solver")
+        self.root.title(" Maze Runner")
 
         self.cell_size = 40
         self.rows = 4
@@ -34,9 +33,9 @@ class MazeApp:
 
         control_frame = tk.Frame(self.root)
         control_frame.pack(pady=10)
-        tk.Button(control_frame, text="🔁 Reset", command=self.reset_maze).pack(side=tk.LEFT, padx=10)
-        tk.Button(control_frame, text="🎲 Random Maze", command=self.generate_random_maze).pack(side=tk.LEFT, padx=10)
-        tk.Button(control_frame, text="🧪 Compare All", command=self.compare_all).pack(side=tk.LEFT, padx=10)
+        tk.Button(control_frame, text=" Reset", command=self.reset_maze).pack(side=tk.LEFT, padx=10)
+        tk.Button(control_frame, text=" Random Maze", command=self.generate_random_maze).pack(side=tk.LEFT, padx=10)
+        tk.Button(control_frame, text=" Compare All", command=self.compare_all).pack(side=tk.LEFT, padx=10)
 
         self.status_label = Label(self.root, text="", font=("Helvetica", 12), bg="#f0f0f0", pady=5)
         self.status_label.pack()
@@ -89,10 +88,10 @@ class MazeApp:
         start = time.time()
         came_from, path, visited = search_function(self.start_node, self.end_node, self.graph)
         end = time.time()
-        elapsed = calculate_elapsed_time(start, end) * 1000
+        elapsed = calculate_elapsed_time(start, end) * 100
         visited_count = len(set(visited))
         self.status_label.config(text=f"{name} completed in {elapsed:.4f} seconds. Path length: {len(path)} | Visited: {visited_count}")
-        self.root.after(500, lambda: self.animate_path(path))
+        self.root.after(500, lambda: self.animate_visited_and_path(visited, path))
 
     def animate_path(self, path):
         for i, node in enumerate(path):
@@ -112,10 +111,10 @@ class MazeApp:
         self.status_label.config(text="")
 
     def generate_random_maze(self):
-        self.grid = [[0 if random.random() > 0.3 else 1 for _ in range(self.cols)] for _ in range(self.rows)]
-        self.grid[0][0] = 0
-        self.grid[3][8] = 0
-        self.rebuild_graph()
+        self.maze = Maze.generate_random(self.rows, self.cols)
+        self.grid = self.maze.grid
+        self.graph = self.maze.adj_list
+        self.draw_maze()
 
     def compare_all(self):
         compare_win = Toplevel(self.root)
@@ -141,6 +140,23 @@ class MazeApp:
                 canvas.create_rectangle(c*25+8, r*25+8, c*25+17, r*25+17, fill="blue", outline="")
             canvas.create_text(5, 5, text=name, anchor="nw", font=("Arial", 10, "bold"))
 
+    def animate_visited_and_path(self, visited, path):
+        delay = 150
+
+        # Show all visited nodes including START/END
+        for i, node in enumerate(visited):
+            self.root.after(i * delay, lambda n=node: self.draw_visited(n))
+
+        # Show full path including START and END
+        for i, node in enumerate(path):
+            self.root.after((len(visited) + i) * delay, lambda n=node: self.place_robot(n))
+
+    def draw_visited(self, pos):
+        x1 = pos[1] * self.cell_size + 5
+        y1 = pos[0] * self.cell_size + 5
+        x2 = x1 + self.cell_size - 10
+        y2 = y1 + self.cell_size - 10
+        self.canvas.create_rectangle(x1, y1, x2, y2, fill="green", outline="")
 if __name__ == "__main__":
     root = tk.Tk()
     app = MazeApp(root)

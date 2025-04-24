@@ -1,3 +1,4 @@
+import random
 import heapq
 
 class Maze:
@@ -5,13 +6,24 @@ class Maze:
         self.grid = grid
         self.adj_list = self.build_adjacency_list()
 
+    @staticmethod
+    def generate_random(rows, cols, wall_chance=0.3):
+        while True:
+            grid = [[0 if random.random() > wall_chance else 1 for _ in range(cols)] for _ in range(rows)]
+            grid[0][0] = 0
+            grid[rows - 1][cols - 1] = 0
+            maze = Maze(grid)
+            _, path, _ = run_bfs((0, 0), (rows - 1, cols - 1), maze.adj_list)
+            if path:
+                return maze
+
     def get_neighbors(self, row, col):
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         neighbors = []
         for dr, dc in directions:
             r, c = row + dr, col + dc
             if 0 <= r < len(self.grid) and 0 <= c < len(self.grid[0]) and self.grid[r][c] == 0:
-                neighbors.append(((r, c), 1))  # edge weight = 1
+                neighbors.append(((r, c), 1))
         return neighbors
 
     def build_adjacency_list(self):
